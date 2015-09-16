@@ -1,0 +1,60 @@
+.map{
+    width:800px;
+    height: 800px;
+                              
+}
+
+.title{
+    width:800px;
+    height:80px;
+    margin-top:-80px;
+    z-index:100;
+    opacity: 0.7;
+    color:white;
+    text-align: center;
+    font-size:40px;
+}
+
+.titletext{
+ font-size:32px;
+ font-family: Arial;
+ stroke:none;   
+ fill:white;
+}
+
+
+path {
+  fill: none;
+  stroke: none;
+}
+
+
+/*
+.major_road { stroke: #444;  stroke-width:1px; }
+.minor_road { stroke: #444; stroke-width:1px; }
+.highway { stroke:#444; stroke-width:1px; }
+.rail { stroke: none; }
+
+
+
+.buildings path{
+    fill: none;
+    fill-opacity:0.4;
+    stroke: white;
+}
+
+.water path{
+    stroke:none;
+    fill:#000;
+}
+
+.landuse path{
+    stroke: none;
+}
+*/
+
+.roadname{
+    font-size: 0px;
+    font-family: arial;
+    stroke:none;
+}
