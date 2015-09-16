@@ -9,22 +9,9 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div ng-controller="MainCtrl" style"padding:20px">
-        <h2>A single map</h2>
-        <div class="map">
-            <map-preview theme="theme" layout="layout" center="center" zoomfactor="zoomfactor" title="title">
-            </map-preview>
-        </div>
+    <div ng-controller="MainCtrl" style="padding:20px">
+        <h2>So many maps</h2>
 
-
-
-        <!--
-        <div wallmap-map class="map" center="center" zoomfactor="zoomfactor" theme="theme"></div>
-
-        <div wallmap-title class="title" theme="theme" title="title">
-            London
-        </div>
-        -->
         <div>
         <form class="pure-form pure-form-stacked">
             <fieldset>
@@ -32,30 +19,22 @@
 
                 <label for="state">Theme</label>
                 <select id="state" ng-model="themeName">
-                    <option value="ruperstrian">Rupestrian</option>
                     <option value="aubergine">Aubergine</option>
                     <option value="sunrise">Sunrise</option>
+                    <option value="ruperstrian">Rupestrian</option>
                 </select>
-
-                <label for="place">Place</label>
-                <select id="place" ng-model="placeName">
-                    <option value="Milano">Milano</option>
-                    <option value="Paris">Paris</option>
-                    <option value="New York">New York</option>
-                    <option value="London">London</option>
-                    <option value="Kathmandu">Kathmandu</option>
-                    
-                </select>
-
-                <label for="title">Title</label>
-                <input id="title" type="text" ng-model="title">
 
                 <label for="zoomfactor">Zoom factor</label>
-                <input id="zoomfactor" type="text" ng-model="zoomfactor">
+                <input id="zoomfactor" type="number" min="1" max="20" ng-model="zoomfactor">
 
             </fieldset>
         </form>
         </div>
+        <div class="map" ng-repeat="(k,v) in places">
+            <map-preview theme="theme" layout="layout" center="v" zoomfactor="zoomfactor" title="k">
+            </map-preview>
+        </div>
+
         
         
         
