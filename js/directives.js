@@ -89,7 +89,7 @@ angular.module('wallmaps')
     return {
         restrict: 'E',
         replace:true,
-        scope : { theme : "=", layout : "=", center : "=", zoomfactor : "=", title : "=" },
+        scope : { theme : "=", layout : "=", center : "=", zoomfactor : "=", title : "=", subtitle : "=" },
         template : '<svg height="100%" width="100%"><g background></g><g map></g><g textual></g></svg>',
         link: function (scope, iElement, iAttrs) {
             scope.$watch('layout', function(nv){
@@ -147,8 +147,10 @@ angular.module('wallmaps')
             var svg = d3.select(s[0]);
             var container;
 
-
+            
             var drawChart = function(){
+                var subtitle = scope.subtitle || "Lat: " + scope.center.y + ", Lon: " +  scope.center.x
+
                 var width = s.width();
                 var height = s.height();
                 if(container){
@@ -193,6 +195,23 @@ angular.module('wallmaps')
 
                 if(scope.theme.text.title && scope.theme.text.title.style){
                     applyStyle(scope.theme.text.title.style, txt);
+                }
+
+                var subtxt = container
+                    .append("text")
+                    .style("text-anchor", "middle")
+                    .text(subtitle);
+
+                if(scope.layout.text.subtitle){
+                    applyAttrs(scope.layout.text.subtitle, subtxt);
+                }
+
+                if(scope.layout.text["subtitle-style"]){
+                    applyStyle(scope.layout.text["subtitle-style"], subtxt);
+                }
+
+                if(scope.theme.text.subtitle && scope.theme.text.subtitle.style){
+                    applyStyle(scope.theme.text.subtitle.style, subtxt);
                 }
 
 

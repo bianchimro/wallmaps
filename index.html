@@ -11,7 +11,7 @@
 <body>
     <div ng-controller="MainCtrl" style="padding:20px">
         <h2>A single map</h2>
-        <div class="map">
+        <div class="map" style="border:solid #ccc 1px;">
             <map-preview theme="theme" layout="layout" center="center" zoomfactor="zoomfactor" title="title">
             </map-preview>
         </div>
@@ -39,11 +39,14 @@
 
                 <label for="place">Place</label>
                 <select id="place" ng-model="placeName">
+                    <option value="Firenze">Firenze</option>
                     <option value="Milano">Milano</option>
                     <option value="Paris">Paris</option>
                     <option value="New York">New York</option>
                     <option value="London">London</option>
                     <option value="Kathmandu">Kathmandu</option>
+                    <option value="Venezia">Venezia</option>
+
                     
                 </select>
 

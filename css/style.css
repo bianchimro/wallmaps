@@ -1,27 +1,8 @@
 .map{
-    width:800px;
-    height: 800px;
+    width:600px;
+    height: 900px;
                               
 }
-
-.title{
-    width:800px;
-    height:80px;
-    margin-top:-80px;
-    z-index:100;
-    opacity: 0.7;
-    color:white;
-    text-align: center;
-    font-size:40px;
-}
-
-.titletext{
- font-size:32px;
- font-family: Arial;
- stroke:none;   
- fill:white;
-}
-
 
 path {
   fill: none;
