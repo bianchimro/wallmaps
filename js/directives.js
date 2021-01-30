@@ -8,18 +8,18 @@ var layers = ['water', 'landuse', 'roads', 'buildings'];
 var createGradient = function(element, options, id){
 
     element = d3.select(element[0])
-    
+
     var defs = d3.select("defs", element)
     if(!defs[0][0]){
-        defs = element.append('defs')    
+        defs = element.append('defs')
     }
-    
+
     var grad = defs.select("#"+id)
-    
+
     if(!grad[0][0]){
         grad = defs.append('linearGradient').attr("id", id)
     }
-    
+
     var gradient = defs.select("#"+id)
         .attr("x1", options.x1 || "0%")
         .attr("x2", options.x2 || "100%")
@@ -31,7 +31,7 @@ var createGradient = function(element, options, id){
         .attr("offset", options.x1 || "0%")
         .attr("stop-color", options.color1)
         .attr("stop-opacity", 1);
-    
+
     gradient
         .append("svg:stop")
         .attr("offset", options.x2 || "100%")
@@ -72,7 +72,7 @@ angular.module('wallmaps')
                 }
                 svc.cache[url] = data;
                 deferred.resolve(data)
-            });   
+            });
         }
 
         return deferred.promise;
@@ -81,7 +81,7 @@ angular.module('wallmaps')
 
     return svc;
 
-    
+
 }])
 
 
@@ -90,7 +90,7 @@ angular.module('wallmaps')
         restrict: 'E',
         replace:true,
         scope : { theme : "=", layout : "=", center : "=", zoomfactor : "=", title : "=", subtitle : "=" },
-        template : '<svg height="100%" width="100%"><g background></g><g map></g><g textual></g></svg>',
+        template : '<svg height="100%" width="100%" id="svg"><g background></g><g map></g><g textual></g></svg>',
         link: function (scope, iElement, iAttrs) {
             scope.$watch('layout', function(nv){
                 if(!nv){
@@ -101,7 +101,7 @@ angular.module('wallmaps')
                 .attr("width", nv.doc.width)
                 .attr("height", nv.doc.height)
             })
-            
+
         }
     };
 }])
@@ -120,7 +120,7 @@ angular.module('wallmaps')
                 .style("fill", "none")
 
             scope.$watch('theme', function(nv){
-                
+
                 if(scope.theme.background){
 
                     if(scope.theme.background.gradient){
@@ -147,37 +147,38 @@ angular.module('wallmaps')
             var svg = d3.select(s[0]);
             var container;
 
-            
+
             var drawChart = function(){
                 var subtitle = scope.subtitle || "Lat: " + scope.center.y + ", Lon: " +  scope.center.x
 
                 var width = s.width();
                 var height = s.height();
+
                 if(container){
                     container.remove();
                 }
 
-                container = d3.select(s[0]).append('svg');
+                container = d3.select(s[0]).append('g');
 
                 if(scope.layout.text && scope.layout.text.margin){
                     var margin = scope.layout.text.margin;
                     width = width - (margin.left || 0) - (margin.right || 0);
                     height = height - (margin.top || 0) - (margin.bottom || 0);
-                    
+
                     container
-                    .attr("width", width)
-                    .attr("height", height)
-                    .attr("x", margin.left || 0)
-                    .attr("y", margin.top || 0)
-                    //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    //.attr("width", width)
+                    //.attr("height", height)
+                    //.attr("x", margin.left || 0)
+                    //.attr("y", margin.top || 0)
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                 }
 
 
                 var rect = container
                     .append('rect')
-                    .attr("width", "100%")
-                    .attr("height", "100%")
+                    .attr("width", width)
+                    .attr("height", height)
                     .style("fill", "none");
 
                 var txt = container
@@ -231,10 +232,10 @@ angular.module('wallmaps')
                 }
 
             }
-            
 
-           
-            
+
+
+
 
             scope.$watch(function(){
                 return { theme : scope.theme, layout:scope.layout, title:scope.title, zoomfactor : scope.zoomfactor}
@@ -267,13 +268,30 @@ angular.module('wallmaps')
                 var width = s.width();
                 var height = s.height();
 
-                container = d3.select(s[0]).append('svg');
+                container = d3.select(s[0]).append('g')
+                .attr("class", "map-container")
+
+
+                if(scope.layout.map && scope.layout.map.margin){
+                    var margin = scope.layout.map.margin;
+                    width = width - (margin.left || 0) - (margin.right || 0);
+                    height = height - (margin.top || 0) - (margin.bottom || 0);
+
+                    container
+                    //.attr("width", width)
+                    //.attr("height", height)
+                    //.attr("x", margin.left || 0)
+                    //.attr("y", margin.top || 0)
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                }
+
+
                 var rect = container
                     .append('rect')
-                    .attr("width", "100%")
-                    .attr("height", "100%")
+                    .attr("width", width)
+                    .attr("height", height)
                     .style("fill", "none")
-
 
                 if(scope.theme.map){
 
@@ -287,26 +305,14 @@ angular.module('wallmaps')
 
                 }
 
-                if(scope.layout.map && scope.layout.map.margin){
-                    var margin = scope.layout.map.margin;
-                    width = width - (margin.left || 0) - (margin.right || 0);
-                    height = height - (margin.top || 0) - (margin.bottom || 0);
-                    
-                    container
-                    .attr("width", width)
-                    .attr("height", height)
-                    .attr("x", margin.left || 0)
-                    .attr("y", margin.top || 0)
-                    //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-                }
-
-            
                 container.empty();
+
                 var promises = [];
-                
+
                 var tiler = d3.geo.tile()
-                    .size([width, height]);
+                    .size([width, height])
+
 
                 projection = d3.geo.mercator()
                     .center([scope.center.x, scope.center.y])
@@ -316,20 +322,26 @@ angular.module('wallmaps')
                 var path = d3.geo.path()
                     .projection(projection);
 
-                container.selectAll("g")
+
+                var protranslate = projection([0, 0]);
+
+                container
+                    .selectAll("g")
                     .data(tiler
                       .scale(projection.scale() * 2 * Math.PI)
-                      .translate(projection([0, 0])))
-                  .enter().append("g")
+                      .translate(protranslate))
+
+                    .enter()
+                    .append("g")
                     .each(function(d) {
                         //console.log(d)
                       var g = d3.select(this);
-                      var url = "https://vector.mapzen.com/osm/all/" + d[2] + "/" + d[0] + "/" + d[1] + ".topojson?api_key=vector-tiles-LM25tq4";
+                      var url = "http://tile.nextzen.com/tilezen/vector/v1/all/" + d[2] + "/" + d[0] + "/" + d[1] + ".topojson?api_key=zLuXf7cuQHahn0M5LBAwAQ";
                       var promise = vectorData.getData(url);
                       promises.push(promise);
-                      
+
                       promise.then(function(data){
-                         
+
                         _.each(layers, function(k){
 
                             if(!data.objects[k]){
@@ -342,21 +354,22 @@ angular.module('wallmaps')
                             var json = topojson.feature(data, data.objects[k]);
 
                             var g2 = g.append("g")
-                            .attr("class", k);
+                            .attr("class", k)
 
                             var addTxt = function(){
                                 console.log(this)
                             }
                             //console.log(k, json[k])
-                            var enterF = g2.selectAll("path")
+                            var enterF = g2
+                            .selectAll("path")
                             .data(json.features.sort(function(a, b) { return a.properties.sort_key - b.properties.sort_key; }))
                             .enter();
 
-                            
+
                             var setStyle = function(){
-                                var clsp = this.attr("parent-class"); 
+                                var clsp = this.attr("parent-class");
                                 var cls = this.attr("class");
-                                
+
                                 if(scope.theme[clsp]){
                                     applyStyle(scope.theme[clsp], this);
                                 }
@@ -371,23 +384,23 @@ angular.module('wallmaps')
                                 .attr("d", path)
                                 .call(setStyle)
                         });
-                        
-                        
+
+
                       });
                     });
-                
+
 
                 $q.all(promises)
                 .finally(function(){
                     var rect2 = container
                     .append('rect')
-                    .attr("width", "100%")
-                    .attr("height", "100%")
+                    .attr("width", width)
+                    .attr("height", height)
                     .style("fill", "none")
 
                     if(scope.theme.map && scope.theme.map.style){
                         applyStyle(scope.theme.map.style, rect2);
-                      
+
                     }
 
                 });
@@ -404,25 +417,25 @@ angular.module('wallmaps')
                         zoomfactor : scope.zoomfactor,
                         theme : scope.theme
                     }
-                }, 
+                },
                 function(nv){
                     console.log(1, nv)
                     if(!nv.theme){
                         console.log("exiting")
                         return
                     }
-                    
+
                     drawChart();
-                }, 
+                },
                 true);
-            
 
 
 
 
 
 
-            
+
+
         }
     };
 }])
@@ -462,9 +475,9 @@ angular.module('wallmaps')
                     .attr("width", width)
                     .attr("height", height);
 
-                
 
-                
+
+
                 var rect = svg
                     .append("rect")
                     .attr("x", 0)
@@ -488,9 +501,9 @@ angular.module('wallmaps')
                     };
 
                 }
-                
 
-                    
+
+
                 container.selectAll("g")
                     .data(tiler
                       .scale(projection.scale() * 2 * Math.PI)
@@ -500,10 +513,10 @@ angular.module('wallmaps')
                         console.log(d)
                       var g = d3.select(this);
                       //d3.json("http://" + ["a", "b", "c"][(d[0] * 31 + d[1]) % 3] + ".tile.openstreetmap.us/vectiles-highroad/" + d[2] + "/" + d[0] + "/" + d[1] + ".json", function(error, json) {
-                      var url = "https://vector.mapzen.com/osm/all/" + d[2] + "/" + d[0] + "/" + d[1] + ".topojson?api_key=vector-tiles-LM25tq4";
+                      var url = "http://tile.nextzen.com/tilezen/vector/v1/all/" + d[2] + "/" + d[0] + "/" + d[1] + ".topojson?api_key=zLuXf7cuQHahn0M5LBAwAQ";
                       vectorData.getData(url)
                       .then(function(data){
-                         
+
                         _.each(layers, function(k){
                             if(!data.objects[k]){
                                 return;
@@ -522,11 +535,11 @@ angular.module('wallmaps')
                             .data(json.features.sort(function(a, b) { return a.properties.sort_key - b.properties.sort_key; }))
                             .enter();
 
-                            
+
                             var setStyle = function(){
-                                var clsp = this.attr("parent-class"); 
+                                var clsp = this.attr("parent-class");
                                 var cls = this.attr("class");
-                                
+
                                 if(scope.theme[clsp]){
                                     applyStyle(scope.theme[clsp], this);
                                 }
@@ -541,15 +554,15 @@ angular.module('wallmaps')
                                 .attr("d", path)
                                 .call(setStyle)
 
-                            
-                            
+
+
 
                             if(k == 'roads' ){
                                 var e = g2.append("defs")
                                 .selectAll("path")
                                 .data(json.features.sort(function(a, b) { return a.properties.sort_key - b.properties.sort_key; }))
                                     .enter();
-                                
+
                                 e
                                     .append("path")
                                     .attr("d", path)
@@ -578,10 +591,10 @@ angular.module('wallmaps')
 
 
 
-                            
+
                         })
-                        
-                        
+
+
                       });
                     });
 
@@ -596,16 +609,16 @@ angular.module('wallmaps')
                         zoomfactor : scope.zoomfactor,
                         theme : scope.theme
                     }
-                }, 
+                },
                 function(nv){
                     if(!nv.theme){
                         return
                     }
                     console.log(1)
                     drawChart();
-                }, 
+                },
                 true);
-            
+
         }
     };
 }])
@@ -652,19 +665,19 @@ angular.module('wallmaps')
                         title : scope.title,
                         theme : scope.theme
                     }
-                }, 
+                },
                 function(nv){
                     if(!nv.theme){
                         return
                     }
                     drawChart();
-                }, 
+                },
                 true);
-            
+
         }
     };
 }])
 
 
-    
+
 })();
